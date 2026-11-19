@@ -25,8 +25,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 安装 Android SDK
-        uses: android-actions/setup-android@v3
+      - name: 安装 Android SDK 组件
+        run: |
+          SDKROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMGR=$(find "$SDKROOT/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -n 1)
+          if [ -z "$SDKMGR" ]; then echo "未找到 sdkmanager（SDKROOT=$SDKROOT）" >&2; exit 1; fi
+          echo "sdkmanager: $SDKMGR"
+          # 用 yes 自动应答 license 提示，避免 setup-android 那样卡在交互 (y/N)
+          yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
+          "$SDKMGR" --install "platforms;android-34" "build-tools;34.0.0" > /dev/null
+          echo "Android SDK 组件就绪（platform 34 / build-tools 34.0.0）"
 
       - name: 安装 Gradle 8.7
         uses: gradle/actions/setup-gradle@v4
