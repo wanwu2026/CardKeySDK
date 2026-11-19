@@ -14,12 +14,7 @@ import com.example.cardkey.R;
 import com.example.cardkey.core.LicenseException;
 import com.example.cardkey.core.LicensePayload;
 
-/**
- * 通用激活对话框。开发者一行代码即可弹出：
- *   new ActivationDialog(context).show();
- *
- * 它调用 CardKey 单例完成激活；成功后可自动关闭并回调。
- */
+/** 通用激活对话框：调用 CardKey 单例完成激活。 */
 public class ActivationDialog extends Dialog {
     private EditText codeInput;
     private TextView message;

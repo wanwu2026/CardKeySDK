@@ -5,7 +5,7 @@ name: Build Demo APK
 
 on:
   push:
-    branches: [master, main]
+    branches: [normal-android-app]
     tags: ['v*']
   workflow_dispatch:
 

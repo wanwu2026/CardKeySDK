@@ -5,16 +5,7 @@ import android.content.SharedPreferences;
 
 import java.security.MessageDigest;
 
-/**
- * 激活状态持久化。
- *
- * 关键点：不是"存一个 boolean 说已激活"（那太容易被改），而是保存验签通过的
- * 完整凭证字符串，每次读取时重新验签 + 校验设备 + 校验有效期。
- * 因此单独篡改 payload 会因签名不匹配而失效。
- *
- * 诚实说明：客户端加固只能防"顺手改 SharedPreferences"，无法防反编译后
- * 替换成另一张合法卡密——那是发卡方要靠设备绑定 + 在线验卡解决的问题。
- */
+/** 激活状态持久化：保存验签通过的凭证，读取时重新验签并校验设备与有效期。 */
 public final class ActivationStore {
     private static final String PREF = "ck_activation";
     private static final String KEY_LICENSE = "license";
@@ -57,7 +48,7 @@ public final class ActivationStore {
         return license;
     }
 
-    /** 用内置公钥重新验证已保存的凭证；返回有效载荷，失败返回 null。 */
+    /** 重新验签已保存的凭证，失败返回 null。 */
     public LicensePayload loadVerified(java.security.PublicKey publicKey) {
         String license = loadRaw();
         if (license == null) return null;

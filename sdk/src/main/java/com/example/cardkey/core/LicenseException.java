@@ -3,15 +3,15 @@ package com.example.cardkey.core;
 /** 激活/验卡过程中可判别的错误。 */
 public final class LicenseException extends Exception {
     public enum Code {
-        MALFORMED,            // 卡密格式错误
-        INVALID_SIGNATURE,    // 签名不正确（伪造/篡改）
-        UNSUPPORTED_VERSION,  // 版本不支持
-        BAD_PUBLIC_KEY,       // 内置公钥配置错误
-        DEVICE_MISMATCH,      // 设备不匹配
-        EXPIRED,              // 已过期
-        NETWORK,              // 网络错误
-        SERVER_REJECTED,      // 服务器明确拒绝
-        STORAGE_TAMPERED      // 本地激活状态被篡改
+        MALFORMED,
+        INVALID_SIGNATURE,
+        UNSUPPORTED_VERSION,
+        BAD_PUBLIC_KEY,
+        DEVICE_MISMATCH,
+        EXPIRED,
+        NETWORK,
+        SERVER_REJECTED,
+        STORAGE_TAMPERED
     }
 
     private final Code code;
@@ -28,7 +28,7 @@ public final class LicenseException extends Exception {
 
     public Code getCode() { return code; }
 
-    /** 面向用户的友好文案（不含内部细节） */
+    /** 面向用户的友好文案。 */
     public String friendlyMessage() {
         switch (code) {
             case INVALID_SIGNATURE: return "卡密无效或已被篡改";

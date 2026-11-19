@@ -14,15 +14,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 /**
  * 凭证编解码与验签（客户端只读，不需要私钥）。
- *
- * 凭证（卡密）格式，全部 Base32 编码后按 4 段用 '-' 分隔展示：
- *   PAYLOAD_B32 . SIG_B32
- * PAYLOAD 为定长二进制，字段顺序固定（见 encodePayload/decodePayload）：
  *   magic(4) | version(1) | productId(UTF) | deviceId(UTF) | issuedAt(8) | expiresAt(8) | serial(8)
- * SIG 为 RSASSA-PKCS1-v1_5 / SHA-256 对 PAYLOAD 原始字节的签名（256 字节）。
- *
- * 验证流程：拆分 → Base32 解码 → 验签 → 解析载荷 → 设备/时间校验。
- * 任何篡改都会导致验签失败或被解析拒绝。
  */
 public final class LicenseVerifier {
     private static final int MAGIC = 0x4B564C31; // "KVL1"
@@ -39,20 +31,17 @@ public final class LicenseVerifier {
         byte[] payloadBytes = Base32.decode(parts.payloadB32);
         byte[] sig = Base32.decode(parts.sigB32);
 
-        // 1) 先验签——签名覆盖整个 payload，先验签可避免解析攻击者构造的数据
+        // 先验签再解析，避免处理攻击者构造的数据
         if (!verifySignature(payloadBytes, sig, publicKey)) {
             throw new LicenseException(LicenseException.Code.INVALID_SIGNATURE, "签名验证失败");
         }
 
-        // 2) 解析载荷
         LicensePayload p = decodePayload(payloadBytes);
 
-        // 3) 设备绑定校验
         if (!p.matchesDevice(actualDeviceId)) {
             throw new LicenseException(LicenseException.Code.DEVICE_MISMATCH, "卡密绑定了其他设备");
         }
 
-        // 4) 有效期校验
         if (p.isExpired()) {
             throw new LicenseException(LicenseException.Code.EXPIRED, "卡密已过期");
         }
@@ -69,19 +58,16 @@ public final class LicenseVerifier {
         }
     }
 
-    /* ---------------------------- 内部实现 ---------------------------- */
-
     private static final class LicenseParts {
         String payloadB32;
         String sigB32;
     }
 
-    /** 支持两种形式：完整 "PAYLOAD.SIG" 或带前缀 "KVL1-PAYLOAD-SIG"。 */
+    /** 接受 PAYLOAD.SIG 或 KVL1-PAYLOAD-SIG。 */
     private static LicenseParts split(String license) throws LicenseException {
         if (license == null) throw new LicenseException(LicenseException.Code.MALFORMED, "卡密为空");
         String s = license.trim().replace(" ", "").replace("\r", "").replace("\n", "");
         if (s.regionMatches(true, 0, "KVL1-", 0, 5)) s = s.substring(5);
-        // 统一用 '.' 作为分隔符（展示时可再替换成 '-'）
         s = s.replace('-', '.');
         int dot = s.indexOf('.');
         if (dot <= 0 || dot == s.length() - 1) {
@@ -129,8 +115,6 @@ public final class LicenseVerifier {
         in.readFully(buf);
         return new String(buf, "UTF-8");
     }
-
-    /* 供工具/测试使用的编码辅助（客户端正常不需要） */
 
     static byte[] buildPayloadForTest(LicensePayload p) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

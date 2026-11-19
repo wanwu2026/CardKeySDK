@@ -3,16 +3,12 @@ package com.example.cardkey.core;
 import java.io.ByteArrayOutputStream;
 import java.util.Locale;
 
-/**
- * RFC 4648 Base32（大写字母 A-Z + 数字 2-7），无 '=' 填充。
- * 纯 Java 实现，不依赖 android.util.Base64，便于在任意 JVM 上复核。
- */
+/** RFC 4648 Base32（A-Z2-7，无 '=' 填充）：按 5 位分组编解码。 */
 public final class Base32 {
     private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
     private Base32() {}
 
-    /** 编码为不带 '=' 填充的大写 Base32 字符串 */
     public static String encode(byte[] data) {
         if (data == null) return "";
         StringBuilder sb = new StringBuilder((data.length * 8 + 4) / 5);
@@ -32,7 +28,7 @@ public final class Base32 {
         return sb.toString();
     }
 
-    /** 解码 Base32；容忍大小写、'-'、换行与 '=' 填充 */
+    /** 解码，容忍大小写、'-'、换行与 '='。 */
     public static byte[] decode(String text) {
         if (text == null) throw new IllegalArgumentException("Base32 输入为 null");
         String s = text.trim().toUpperCase(Locale.US)

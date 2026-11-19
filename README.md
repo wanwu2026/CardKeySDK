@@ -1,6 +1,13 @@
+<a id="中文"></a>
+
 # CardKey · Android 卡密激活 SDK
 
-> 🤖 本项目由 AI 生成。
+> 🤖 本项目由 AI 生成。 / This project is AI-generated.
+
+> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。另有 `xposed-injection-module` 分支，是注入到目标 App 的 Xposed 模块版本。
+> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. Another branch `xposed-injection-module` is an Xposed module injected into target apps.
+
+> 📖 语言 / Language: [中文](#中文) | [English](#english)
 
 一个**纯客户端（前端）**的卡密激活 SDK，面向 Android 应用与 Xposed 模块。
 
@@ -238,10 +245,262 @@ CI 每次构建用新生成的临时签名。请先卸载旧版 Demo 再装新�
 | Demo APK 云端编译（GitHub Actions, Ubuntu + JDK 17 + SDK 34） | ✅ 见 [Releases](https://github.com/wanwu2026/CardKeySDK/releases) |
 | 真机运行 | ⚠️ 请在你的设备上实测 |
 
-说明：作者机器为 aarch64，Google 未提供该架构的 Android build-tools 原生包，故 APK 由 GitHub Actions 的 x86_64 runner 真编译产出，而非本机模拟。
 
 ---
 
 ## License
 
+撰稿人 / Author: wanwu2026
+
 MIT —— 见 [LICENSE](LICENSE)。用它做闭源商业软件也可以；但请遵守"私钥不进客户端"的安全原则。
+
+---
+
+<a id="english"></a>
+
+# CardKey · Android License Activation SDK
+
+A **client-side (front-end)** license activation SDK for Android apps and Xposed modules.
+
+- Activation UI (enter code → verify → unlock) and client verification logic are implemented
+- **Code issuing, verification, and device management live on the backend** — implemented by the developer; this repo provides the API contract and issuing tool
+- Zero third-party runtime dependencies (only Android system APIs: `java.security`, `org.json`, `HttpURLConnection`)
+- Two modes: **offline** (the code itself is the credential, verified locally) / **online** (server verifies and returns a signed credential); the client verification logic is identical for both
+
+> ⚠️ **Honest note (read this first)**: This repo is the "client part". In a secure license system, **the private key and issuing logic must never ship inside the app** — once the key is in the package, anyone can sign their own codes. A real product needs a server you control to hold the key, verify codes, and ban abuse. The offline mode here is for demos and trusted environments; for production use the online mode + backend. See [Security Model](#security-model).
+
+---
+
+## Directory Structure
+
+```
+CardKeySDK/
+├── sdk/                         # SDK library (publish/import separately)
+│   └── src/main/
+│       ├── java/com/example/cardkey/
+│       │   ├── CardKey.java              # singleton entry: init / isActivated / activate
+│       │   ├── core/
+│       │   │   ├── Base32.java           # Base32 codec
+│       │   │   ├── LicensePayload.java   # credential payload
+│       │   │   ├── LicenseVerifier.java  # verify signature + parse + device/time checks
+│       │   │   ├── LicenseException.java # distinguishable error codes
+│       │   │   ├── DeviceId.java         # device ID (ANDROID_ID hash)
+│       │   │   └── ActivationStore.java  # tamper-proof persistence
+│       │   ├── remote/
+│       │   │   ├── RemoteVerifier.java   # pluggable remote verification interface
+│       │   │   └── HttpRemoteVerifier.java # default HTTP implementation
+│       │   └── ui/ActivationDialog.java  # reusable activation dialog
+│       └── res/layout/ck_dialog_activation.xml
+├── demo/                        # demo app (includes Xposed integration example)
+│   ├── demo_license.txt                  # demo code (no device binding, copy to activate)
+│   └── src/main/java/com/example/cardkeydemo/
+│       ├── DemoApp.java                  # SDK init (demo public key embedded)
+│       ├── MainActivity.java             # activation state + dialog
+│       └── XposedCardKeyGate.java        # Xposed module integration skeleton
+├── tools/cardkey_tool.py        # keygen / issue / check tool (not shipped in app)
+├── docs/
+│   ├── backend.md               # backend API contract
+│   ├── keygen.md                # key generation and issuing guide
+│   └── screenshots/             # app screenshots (see "Screenshots")
+├── .github/workflows/build-apk.yml  # CI: build and publish demo APK to Releases
+└── settings.gradle / build.gradle / */build.gradle
+```
+
+---
+
+## Quick Start (Run the Demo)
+
+### Option 1: Install the prebuilt APK (fastest)
+
+Download `CardKeyDemo-release.apk` from [Releases](https://github.com/wanwu2026/CardKeySDK/releases), transfer it to an Android phone, and install it (allow "install from unknown sources").
+
+> The APK is genuinely built in the cloud by GitHub Actions and signed with a temporary key that changes on every build — **uninstall the old version before reinstalling** (different signatures cannot overwrite).
+
+1. Open the app — it shows "Not Activated" and the current device ID.
+2. Tap "Activate / Change Code" and paste this demo code:
+   ```
+   KVL1-JNLEYMIBAAEGIZLNN5PWC4DQAAAAAAABUHZQ535UAAAADXMWMHWAAAAAAAAAAAAD5E-S6IZXUQAQOKLJZEKS6KADYSB5CCCBXYZGG66AYHXSI6OSUJMHMAQK5XITEKRGOLTCRE4WXBQHEJQGUSVSQZCKKD6FOTZ73SU5LNKHYE2VPYLBG3RVI6ZDFS4WDPH7TFFAWJWIU6JBKWAZ7LSOHDHUWKL2M72TJDMDUVLCGITDBWGTSFY74C65NGP2UKGHSXA3A5XPW35PF7ZECNJWESL7ZBPEGUECXOAQMLDV7UETSLH3CRMKMQIYY43NMLSMP6TA6XZESNCL4MIIVR3JVOTM4HBLG55IEYUDFRRTNSFD2LQWG5LNZANYXZOSBWDRH32BC6HVNBP56ANLD3GGCMK2KWBTUAF2VTUC7BCXZE6N4LI2NPSG6AZ5QH6Z4G4IO3JWGF2CIFZKYUG2E2AG6OYLZRDRY
+   ```
+   (Also in `demo/demo_license.txt` — **no device binding, expires 2035**, works on any device.)
+3. Seeing "✓ Activated" means success. Tap "Clear activation" to test repeatedly.
+
+### Option 2: Build it yourself
+
+Open this directory in Android Studio (Gradle 8.7 + Android SDK 34 + JDK 17), build the `demo` module, and install it on your phone. The first offline build needs internet to download dependencies.
+
+> The APK is genuinely built in the cloud (see [.github/workflows/build-apk.yml](.github/workflows/build-apk.yml)). Core algorithms are cross-verified with Python/OpenSSL (see "Verification" below). No Android SDK or signing key is bundled in this repo.
+
+---
+
+## Screenshots
+
+Real photos taken on a device:
+
+| Not activated | Activated |
+|---|---|
+| ![Not activated](docs/screenshots/01-inactive.jpg) | ![Activated](docs/screenshots/02-activated.jpg) |
+
+| Enter code | Activation details |
+|---|---|
+| ![Enter code](docs/screenshots/03-activate-dialog.jpg) | ![Details](docs/screenshots/04-activated-detail.jpg) |
+
+---
+
+## Integrate into Your App (3 Steps)
+
+**1. Dependency**: import the `sdk` module as a library (`implementation project(':sdk')`), or package it as an AAR.
+
+**2. Initialize** (recommended in `Application.onCreate`):
+
+```java
+CardKey.init(new CardKey.Config(this)
+        .productId("my_app")                  // your product ID
+        .publicKeyBase64(PUBLIC_KEY_BASE64)   // backend public key (see keygen.md)
+        .mode(CardKey.Mode.ONLINE)            // or OFFLINE
+        .remoteVerifier(new HttpRemoteVerifier("https://your.api/verify"))
+);
+```
+
+**3. Business check / activation**:
+
+```java
+// whether to unlock a feature
+if (CardKey.get().isActivated()) {
+    // activated, allow
+}
+
+// show the activation dialog
+new ActivationDialog(activity)
+    .setOnActivatedListener(p -> { /* activated */ })
+    .show();
+
+// or call directly (no UI)
+CardKey.get().activate(code, new CardKey.Callback() {
+    public void onSuccess(LicensePayload p) { /* success */ }
+    public void onError(LicenseException e) { toast(e.friendlyMessage()); }
+});
+```
+
+---
+
+## License Code Format
+
+Credential = `KVL1-<payload-Base32>-<signature-Base32>` (the `KVL1` prefix is optional).
+
+The payload is fixed-length big-endian binary:
+
+| Field | Type | Description |
+|---|---|---|
+| magic | uint32 | `0x4B564C31` ("KVL1") |
+| version | uint8 | currently 1 |
+| productId | uint16 length + UTF-8 | product identifier |
+| deviceId | uint16 length + UTF-8 | bound device ID; empty = unbound |
+| issuedAt | int64 | issue time, epoch ms |
+| expiresAt | int64 | expiry time, epoch ms; 0 = never |
+| serial | int64 | serial number |
+
+Signature = `RSASSA-PKCS1-v1_5 / SHA-256` over the entire raw payload bytes, RSA-2048 (256 bytes). Base32 uses the RFC 4648 alphabet `A-Z2-7`, no `=` padding.
+
+Client verification order: **verify signature → parse → check device binding → check expiry**. Any failure rejects.
+
+---
+
+## Security Model
+
+- **Signature is always verified on the client**: even in online mode when the server returns a credential, the client verifies it with the embedded public key, defending against MITM or a compromised server.
+- **Persistence is not a boolean**: it stores the verified credential string and re-verifies signature + device + time on every read; editing SharedPreferences alone does nothing.
+- **Device binding**: `deviceId` is written at issue time; switching devices breaks it (ANDROID_ID changes on factory reset / some ROMs — a known limitation).
+- **fail-closed**: the Xposed example treats an unavailable state as not activated.
+
+**What it cannot do (don't expect the client to prevent)**:
+- Anti-reverse-engineering / repackaging: your activation check can be patched. Mitigate with obfuscation + server-side validation of critical data.
+- Prevent sharing a legitimate code: rely on device binding + backend activation counts.
+- Defeat root/Xposed itself: that is an arms race, no silver bullet.
+
+**Conclusion**: the real security boundary is the backend (private key isolation + one device one code + real-time bans). The client SDK delivers a good experience and blocks obvious tampering.
+
+---
+
+## What the Backend Must Do
+
+Just provide a verification endpoint that returns a signed credential. Full contract in [docs/backend.md](docs/backend.md), issuing tool in [docs/keygen.md](docs/keygen.md).
+
+Request:
+
+```json
+POST /verify
+{"code":"license code","device_id":"device ID","product_id":"product ID"}
+```
+
+Response:
+
+```json
+// success
+{"ok":true,"license":"KVL1-....-...."}
+// failure
+{"ok":false,"reason":"invalid|used|expired","message":"code already used"}
+```
+
+The `license` is generated by the backend signing the payload with the **private key** — simply reuse the logic in `tools/cardkey_tool.py issue`.
+
+---
+
+## FAQ
+
+<details>
+<summary><b>Q: Why does the demo code work on any device?</b></summary>
+
+It was issued with an empty `deviceId` (no binding) and an expiry of 2035 — deliberately "works out of the box". For real one-device-one-code, issue with `cardkey_tool.py issue --device <device-id>` or bind on the backend in online mode.
+</details>
+
+<details>
+<summary><b>Q: "This code is already activated on another device" — why?</b></summary>
+
+The code was issued bound to a device's `deviceId` (first 16 hex chars of the SHA256 of ANDROID_ID). Factory reset, device change, or ROMs that reset ANDROID_ID cause a mismatch. The backend needs an unbind / device-change flow.
+</details>
+
+<details>
+<summary><b>Q: Can I keep using it forever by changing the system time?</b></summary>
+
+The client reads system time for expiry, so changing it fools the **local** check. Sensitive products must put expiry/ban decisions on the server (online mode + second confirmation for key operations). This is an inherent limit of client-side schemes, not a bug.
+</details>
+
+<details>
+<summary><b>Q: APK install says "signature conflict / app not installed"?</b></summary>
+
+CI generates a fresh temporary signature on every build. Uninstall the old demo before installing the new one. For production, use your own fixed keystore.
+</details>
+
+<details>
+<summary><b>Q: Where do I put my private key to issue my own codes?</b></summary>
+
+On your own server or an offline secure environment — **never in the app, never in git**. Generate with `tools/cardkey_tool.py keygen`, keep `private.pem` safe, and put the public key in the client. See [docs/keygen.md](docs/keygen.md).
+</details>
+
+<details>
+<summary><b>Q: Is offline mode secure enough?</b></summary>
+
+Fine for demos/small tools. It cannot stop "sharing a legitimate code everywhere". For production use online mode + one-device-one-code + activation limits + real-time bans; see [Security Model](#security-model) and [docs/backend.md](docs/backend.md).
+</details>
+
+---
+
+## Verification Record
+
+| Item | Status |
+|---|---|
+| Keygen → issue → check (Python + OpenSSL end-to-end) | ✅ passed |
+| Payload binary round-trip (UTF-8, timestamps, device ID) | ✅ passed |
+| Signature validity / device match checks | ✅ passed |
+| Base32 consistency with Java (same alphabet, no padding) | ✅ manually checked |
+| Demo APK cloud build (GitHub Actions, Ubuntu + JDK 17 + SDK 34) | ✅ see [Releases](https://github.com/wanwu2026/CardKeySDK/releases) |
+| Running on a real device | ⚠️ please test on your device |
+
+
+---
+
+## License
+
+Author: wanwu2026
+
+MIT — see [LICENSE](LICENSE). You may use it in closed-source commercial software; just respect the "never put the private key in the client" principle.
