@@ -1,0 +1,29 @@
+# 私钥 / 密钥
+keys/
+private.pem
+*.pem
+public.der
+.verify_keys/
+
+# Gradle / Android 构建产物
+.gradle/
+build/
+*/build/
+local.properties
+.idea/
+*.iml
+.gradle
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Python 缓存
+__pycache__/
+*.pyc
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+*.swp
+
+# Demo 私钥不应存在；演示卡密与公钥是公开的，故不忽略 demo/

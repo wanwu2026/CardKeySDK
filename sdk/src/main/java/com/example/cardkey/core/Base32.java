@@ -1,0 +1,62 @@
+package com.example.cardkey.core;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Locale;
+
+/**
+ * RFC 4648 Base32（大写字母 A-Z + 数字 2-7），无 '=' 填充。
+ * 纯 Java 实现，不依赖 android.util.Base64，便于在任意 JVM 上复核。
+ */
+public final class Base32 {
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+    private Base32() {}
+
+    /** 编码为不带 '=' 填充的大写 Base32 字符串 */
+    public static String encode(byte[] data) {
+        if (data == null) return "";
+        StringBuilder sb = new StringBuilder((data.length * 8 + 4) / 5);
+        int buffer = 0;
+        int bitsLeft = 0;
+        for (byte b : data) {
+            buffer = (buffer << 8) | (b & 0xFF);
+            bitsLeft += 8;
+            while (bitsLeft >= 5) {
+                sb.append(ALPHABET.charAt((buffer >>> (bitsLeft - 5)) & 31));
+                bitsLeft -= 5;
+            }
+        }
+        if (bitsLeft > 0) {
+            sb.append(ALPHABET.charAt((buffer << (5 - bitsLeft)) & 31));
+        }
+        return sb.toString();
+    }
+
+    /** 解码 Base32；容忍大小写、'-'、换行与 '=' 填充 */
+    public static byte[] decode(String text) {
+        if (text == null) throw new IllegalArgumentException("Base32 输入为 null");
+        String s = text.trim().toUpperCase(Locale.US)
+                .replace("=", "")
+                .replace("-", "")
+                .replace(" ", "")
+                .replace("\r", "")
+                .replace("\n", "");
+        if (s.length() == 0) return new byte[0];
+        ByteArrayOutputStream out = new ByteArrayOutputStream((s.length() * 5) / 8 + 1);
+        int buffer = 0;
+        int bitsLeft = 0;
+        for (int i = 0; i < s.length(); i++) {
+            int idx = ALPHABET.indexOf(s.charAt(i));
+            if (idx < 0) {
+                throw new IllegalArgumentException("非法 Base32 字符: " + s.charAt(i));
+            }
+            buffer = (buffer << 5) | idx;
+            bitsLeft += 5;
+            if (bitsLeft >= 8) {
+                out.write((buffer >>> (bitsLeft - 8)) & 0xFF);
+                bitsLeft -= 8;
+            }
+        }
+        return out.toByteArray();
+    }
+}
