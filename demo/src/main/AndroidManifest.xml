@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- 在线模式需要联网；离线模式可删掉这条权限 -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".DemoApp"
         android:allowBackup="false"
-        android:label="CardKey Demo"
+        android:label="CardKey Xposed Module"
         android:theme="@android:style/Theme.Material.Light"
         android:usesCleartextTraffic="true">
+
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="CardKey license gate for Xposed" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="82" />
 
         <activity
             android:name=".MainActivity"

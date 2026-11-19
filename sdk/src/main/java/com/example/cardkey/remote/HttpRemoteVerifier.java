@@ -10,21 +10,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-/**
- * 默认远程验证实现：POST JSON 到你的服务器，取回签名凭证。
- *
- * 请求体（Content-Type: application/json）：
- *   {"code":"<卡密>","device_id":"<设备码>","product_id":"<产品标识>"}
- *
- * 响应体：
- *   成功 {"ok":true,"license":"<KVL1.B32.B32 凭证字符串>"}
- *   失败 {"ok":false,"reason":"invalid|used|expired|...","message":"..."}
- *
- * 你可以直接改这里适配自己的接口，或在初始化时注入自己的 RemoteVerifier。
- */
+/** 默认远程验证实现：POST JSON 取回服务器签发的凭证。 */
 public class HttpRemoteVerifier implements RemoteVerifier {
     private final String endpoint;
-    private final String token;         // 可选 Bearer Token
+    private final String token;
     private final int connectTimeoutMs;
     private final int readTimeoutMs;
 
@@ -94,7 +83,7 @@ public class HttpRemoteVerifier implements RemoteVerifier {
         return sb.toString();
     }
 
-    /** 服务器明确拒绝（不 credentials 错、卡密无效、已用、过期等）。 */
+    /** 服务器明确拒绝（凭证错误、卡密无效、已用、过期等）。 */
     public static class ServerRejectedException extends Exception {
         public final String reason;
         public ServerRejectedException(String reason, String message) {

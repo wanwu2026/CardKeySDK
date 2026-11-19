@@ -7,7 +7,7 @@ import android.provider.Settings;
 import java.security.MessageDigest;
 import java.util.Locale;
 
-/** 设备标识工具。默认取 ANDROID_ID 并做 SHA-256，便于后续替换为自有设备码。 */
+/** 设备标识工具：取 ANDROID_ID 的 SHA-256 前 16 位。 */
 public final class DeviceId {
     private DeviceId() {}
 
@@ -16,7 +16,7 @@ public final class DeviceId {
         String androidId = "";
         try {
             androidId = Settings.Secure.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
-        } catch (Throwable t) { /* 某些环境取不到，回退固定值 */ }
+        } catch (Throwable t) {}
         if (androidId == null || androidId.length() == 0) androidId = "unknown-device";
         return sha256(androidId).substring(0, 16).toUpperCase(Locale.US);
     }

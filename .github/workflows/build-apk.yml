@@ -1,11 +1,8 @@
-name: Build Demo APK
-
-# 在 GitHub 托管 runner（x86_64，自带 Android SDK）上真编译示例 APK，
-# 发布到 Releases。仓库里不需要放 SDK 或签名密钥。
+name: Build Xposed Module APK
 
 on:
   push:
-    branches: [master, main]
+    branches: [xposed-injection-module]
     tags: ['v*']
   workflow_dispatch:
 
@@ -31,7 +28,6 @@ jobs:
           SDKMGR=$(find "$SDKROOT/cmdline-tools" -name sdkmanager -type f 2>/dev/null | head -n 1)
           if [ -z "$SDKMGR" ]; then echo "未找到 sdkmanager（SDKROOT=$SDKROOT）" >&2; exit 1; fi
           echo "sdkmanager: $SDKMGR"
-          # 用 yes 自动应答 license 提示，避免 setup-android 那样卡在交互 (y/N)
           yes | "$SDKMGR" --licenses > /dev/null 2>&1 || true
           "$SDKMGR" --install "platforms;android-34" "build-tools;34.0.0" > /dev/null
           echo "Android SDK 组件就绪（platform 34 / build-tools 34.0.0）"
@@ -61,29 +57,29 @@ jobs:
         run: |
           APK=$(find demo/build/outputs/apk/release -name '*.apk' | head -n 1)
           if [ -z "$APK" ]; then echo "未找到 APK" >&2; exit 1; fi
-          cp "$APK" "$GITHUB_WORKSPACE/CardKeyDemo-release.apk"
+          cp "$APK" "$GITHUB_WORKSPACE/CardKeyXposed-release.apk"
           echo "APK 路径: $APK"
-          echo "APK 大小: $(du -h "$GITHUB_WORKSPACE/CardKeyDemo-release.apk" | cut -f1)"
-          unzip -p "$GITHUB_WORKSPACE/CardKeyDemo-release.apk" AndroidManifest.xml >/dev/null 2>&1 \
+          echo "APK 大小: $(du -h "$GITHUB_WORKSPACE/CardKeyXposed-release.apk" | cut -f1)"
+          unzip -p "$GITHUB_WORKSPACE/CardKeyXposed-release.apk" AndroidManifest.xml >/dev/null 2>&1 \
             && echo "APK 结构校验: 通过"
 
       - name: 上传构建产物（Actions 页面可下载）
         uses: actions/upload-artifact@v4
         with:
-          name: CardKeyDemo-apk
-          path: CardKeyDemo-release.apk
+          name: CardKeyXposed-apk
+          path: CardKeyXposed-release.apk
           if-no-files-found: error
 
       - name: 发布到 Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: demo-latest
-          name: CardKey Demo APK（最新构建）
+          tag_name: xposed-demo-latest
+          name: CardKey Xposed Module APK（最新构建）
           body: |
-            由 GitHub Actions 自动编译的示例 App，已用临时密钥签名，可直接安装。
+            Xposed 注入式模块，由 GitHub Actions 自动编译，已用临时密钥签名。需先安装 Xposed 框架。
             演示卡密见 `demo/demo_license.txt`（免设备绑定，2035 年到期）。
 
             > 这是**演示包**，签名密钥每次构建都重新生成且随 runner 销毁。
-            > 自己发布正式 App 请用你自己的密钥，见 `docs/keygen.md`。
-          files: CardKeyDemo-release.apk
+            > 自己发布正式模块请用你自己的密钥，见 `docs/keygen.md`。
+          files: CardKeyXposed-release.apk
           preserve_existing_tag: true

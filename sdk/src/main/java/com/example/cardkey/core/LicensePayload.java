@@ -3,10 +3,10 @@ package com.example.cardkey.core;
 /** 已签名凭证的载荷（不可变）。 */
 public final class LicensePayload {
     private final String productId;
-    private final String deviceId;   // 空字符串表示不绑定设备
-    private final long issuedAt;     // 签发时间 epoch millis
-    private final long expiresAt;    // 到期时间 epoch millis，0 表示永久
-    private final long serial;       // 随机序列号，避免同参数生成相同凭证
+    private final String deviceId;
+    private final long issuedAt;
+    private final long expiresAt;
+    private final long serial;
 
     public LicensePayload(String productId, String deviceId, long issuedAt, long expiresAt, long serial) {
         this.productId = productId == null ? "" : productId;

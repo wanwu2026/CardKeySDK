@@ -12,11 +12,7 @@ import com.example.cardkey.CardKey;
 import com.example.cardkey.core.LicensePayload;
 import com.example.cardkey.ui.ActivationDialog;
 
-/**
- * 演示接入方式。
- * 重点看 onCreate 里的三步：init 已在 Application 完成 → isActivated 判断 → 弹激活窗。
- * 界面用纯代码构建，避免额外的布局文件，方便阅读。
- */
+/** 演示接入方式：判断激活状态并弹出激活窗。 */
 public class MainActivity extends Activity {
 
     private TextView statusText;
@@ -90,7 +86,7 @@ public class MainActivity extends Activity {
         refreshStatus();
     }
 
-    /** 这就是业务侧判断"是否解锁功能"的方式。 */
+    /** 业务侧据此判断是否解锁功能。 */
     private void refreshStatus() {
         if (CardKey.get().isActivated()) {
             LicensePayload p = CardKey.get().currentLicense();
