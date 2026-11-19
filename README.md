@@ -4,8 +4,8 @@
 
 > 🤖 本项目由 AI 生成。 / This project is AI-generated.
 
-> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。另有 `xposed-injection-module` 分支，是注入到目标 App 的 Xposed 模块版本。
-> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. Another branch `xposed-injection-module` is an Xposed module injected into target apps.
+> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。👉 另一个版本：[xposed-injection-module · XP 注入式模块应用版](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
+> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. 👉 Other version: [xposed-injection-module (Xposed injection module app)](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
 
 > 📖 语言 / Language: [中文](#中文) | [English](#english)
 
