@@ -46,12 +46,18 @@ CardKeySDK/
 │       ├── DemoApp.java                  # 初始化 SDK（已内嵌演示公钥）
 │       ├── MainActivity.java             # 判断激活状态 + 弹窗
 │       └── XposedCardKeyGate.java        # Xposed 模块接入骨架
-├── tools/cardkey_tool.py        # 密钥生成 / 签发 / 校验工具（不进 app）
+├── tools/
+│   ├── cardkey_tool.py          # 密钥生成 / 签发 / 校验工具（不进 app）
+│   └── test_cardkey_tool.py     # 单元测试（python3 -m unittest）
 ├── docs/
 │   ├── backend.md               # 后端接口约定
 │   ├── keygen.md                # 密钥生成与签发指南
 │   └── screenshots/             # App 效果截图（见"截图展示"）
-├── .github/workflows/build-apk.yml  # CI：云端编译并发布 Demo APK 到 Releases
+├── .github/
+│   ├── workflows/build-apk.yml  # CI：跑单测 + 云端编译 + 发布 APK
+│   ├── ISSUE_TEMPLATE/          # Bug 报告 / 功能建议模板
+│   └── PULL_REQUEST_TEMPLATE.md # PR 模板
+├── CHANGELOG.md / CONTRIBUTING.md / SECURITY.md
 └── settings.gradle / build.gradle / */build.gradle
 ```
 
@@ -297,12 +303,18 @@ CardKeySDK/
 │       ├── DemoApp.java                  # SDK init (demo public key embedded)
 │       ├── MainActivity.java             # activation state + dialog
 │       └── XposedCardKeyGate.java        # Xposed module integration skeleton
-├── tools/cardkey_tool.py        # keygen / issue / check tool (not shipped in app)
+├── tools/
+│   ├── cardkey_tool.py          # keygen / issue / check tool (not shipped in app)
+│   └── test_cardkey_tool.py     # unit tests (python3 -m unittest)
 ├── docs/
 │   ├── backend.md               # backend API contract
 │   ├── keygen.md                # key generation and issuing guide
 │   └── screenshots/             # app screenshots (see "Screenshots")
-├── .github/workflows/build-apk.yml  # CI: build and publish demo APK to Releases
+├── .github/
+│   ├── workflows/build-apk.yml  # CI: unit tests + build + publish APK
+│   ├── ISSUE_TEMPLATE/          # bug report / feature request templates
+│   └── PULL_REQUEST_TEMPLATE.md # PR template
+├── CHANGELOG.md / CONTRIBUTING.md / SECURITY.md
 └── settings.gradle / build.gradle / */build.gradle
 ```
 
