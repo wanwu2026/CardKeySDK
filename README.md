@@ -4,8 +4,8 @@
 
 > 🤖 本项目由 AI 生成。 / This project is AI-generated.
 
-> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。👉 另一个版本：[xposed-injection-module · XP 注入式模块应用版](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
-> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. 👉 Other version: [xposed-injection-module (Xposed injection module app)](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
+> 🌿 **当前分支：`demo-backend`（演示后端版）** —— 可运行的验卡/发卡服务（见 `backend/`）。👉 客户端版本：[normal-android-app · 普通安卓应用](https://github.com/wanwu2026/CardKeySDK/tree/normal-android-app) ｜ [xposed-injection-module · XP 模块](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
+> 🌿 **Current branch: `demo-backend` (demo backend)** — a runnable card-issue/verify service (see `backend/`). 👉 Client versions: [normal-android-app](https://github.com/wanwu2026/CardKeySDK/tree/normal-android-app) | [xposed-injection-module](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
 
 > 📖 语言 / Language: [中文](#中文) | [English](#english)
 
@@ -64,6 +64,8 @@ CardKeySDK/
 ---
 
 ## 快速开始（跑 Demo）
+
+> 🖥️ **这是演示后端分支**。本分支在客户端 SDK 之外，额外提供一个**可直接运行的验卡/发卡服务**（`backend/`），演示私钥只放服务器、一机一码、激活次数与封禁策略。详见 [backend/README.md](backend/README.md)。
 
 ### 方式一：直接装预编译 APK（最快）
 
@@ -321,6 +323,8 @@ CardKeySDK/
 ---
 
 ## Quick Start (Run the Demo)
+
+> 🖥️ **This is the demo-backend branch**. Besides the client SDK, this branch ships a **runnable card-issue/verify service** (`backend/`) demonstrating server-side private keys, one-device-one-code, activation limits and revocation. See [backend/README.md](backend/README.md).
 
 ### Option 1: Install the prebuilt APK (fastest)
 

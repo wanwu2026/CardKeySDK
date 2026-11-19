@@ -27,3 +27,8 @@ Thumbs.db
 *.swp
 
 # Demo 私钥不应存在；演示卡密与公钥是公开的，故不忽略 demo/
+
+# 演示后端：私钥、数据库（绝不进 git）
+backend/keys/
+backend/*.db
+backend/*.db-journal
