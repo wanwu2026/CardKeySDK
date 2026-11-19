@@ -1,5 +1,7 @@
 # CardKey · Android 卡密激活 SDK
 
+> 🤖 **AI 生成声明**：本仓库的代码、文档与示例均由 AI（腾讯混元 Hy）辅助生成，用于学习与演示。作者已 review 核心逻辑，但不提供任何担保；用于生产环境前请自行完成安全审计与真机测试。详见文末[免责声明](#免责声明)。
+
 一个**纯客户端（前端）**的卡密激活 SDK，面向 Android 应用与 Xposed 模块。
 
 - 激活界面（输入卡密 → 验证 → 解锁）+ 客户端验证逻辑，我（AI）已写全
@@ -38,8 +40,11 @@ CardKeySDK/
 │       ├── MainActivity.java             # 判断激活状态 + 弹窗
 │       └── XposedCardKeyGate.java        # Xposed 模块接入骨架
 ├── tools/cardkey_tool.py        # 密钥生成 / 签发 / 校验工具（不进 app）
-├── docs/backend.md              # 后端接口约定
-├── docs/keygen.md               # 密钥生成与签发指南
+├── docs/
+│   ├── backend.md               # 后端接口约定
+│   ├── keygen.md                # 密钥生成与签发指南
+│   └── screenshots/             # App 效果截图（见"截图展示"）
+├── .github/workflows/build-apk.yml  # CI：云端编译并发布 Demo APK 到 Releases
 └── settings.gradle / build.gradle / */build.gradle
 ```
 
@@ -47,14 +52,39 @@ CardKeySDK/
 
 ## 快速开始（跑 Demo）
 
-1. 用 Android Studio 打开本目录（需要 Gradle 8.x + Android SDK 34）。
-2. 编译 `demo` 模块，安装到手机。
-3. 打开 app，点「激活 / 更换卡密」，粘贴 `demo/demo_license.txt` 里的卡密。
-4. 显示「✓ 已激活」即成功。点「清除激活状态」可反复测试。
+### 方式一：直接装预编译 APK（最快）
 
-Demo 已内置一对演示密钥和一张**免设备绑定、2035 年到期**的卡密，开箱即可验证流程。它只用于演示——换成你自己的密钥见 [docs/keygen.md](docs/keygen.md)。
+到 [Releases](https://github.com/wanwu2026/CardKeySDK/releases) 下载 `CardKeyDemo-release.apk`，传到 Android 手机安装（需允许"安装未知来源应用"）。
 
-> 本机未安装 JDK / Android SDK，**未在本机编译验证**。Demo 的 Java 代码经过逐文件自查 + 核心算法用 Python/OpenSSL 交叉验证（见文末"验证记录"），但请在你的 Android Studio 里实际编译运行一次。
+> 该 APK 由 GitHub Actions 云端真编译、用临时密钥签名，每次构建签名都会变——**重装前请先卸载旧版**（签名不同无法覆盖安装）。
+
+1. 打开 app，会显示「未激活」和当前设备码。
+2. 点「激活 / 更换卡密」，粘贴下面这张演示卡密：
+   ```
+   KVL1-JNLEYMIBAAEGIZLNN5PWC4DQAAAAAAABUHZQ535UAAAADXMWMHWAAAAAAAAAAAAD5E-S6IZXUQAQOKLJZEKS6KADYSB5CCCBXYZGG66AYHXSI6OSUJMHMAQK5XITEKRGOLTCRE4WXBQHEJQGUSVSQZCKKD6FOTZ73SU5LNKHYE2VPYLBG3RVI6ZDFS4WDPH7TFFAWJWIU6JBKWAZ7LSOHDHUWKL2M72TJDMDUVLCGITDBWGTSFY74C65NGP2UKGHSXA3A5XPW35PF7ZECNJWESL7ZBPEGUECXOAQMLDV7UETSLH3CRMKMQIYY43NMLSMP6TA6XZESNCL4MIIVR3JVOTM4HBLG55IEYUDFRRTNSFD2LQWG5LNZANYXZOSBWDRH32BC6HVNBP56ANLD3GGCMK2KWBTUAF2VTUC7BCXZE6N4LI2NPSG6AZ5QH6Z4G4IO3JWGF2CIFZKYUG2E2AG6OYLZRDRY
+   ```
+   （同一张也在 `demo/demo_license.txt`，**免设备绑定、2035 年到期**，任何设备可用）
+3. 显示「✓ 已激活」即成功。点「清除激活状态」可反复测试。
+
+### 方式二：自己编译
+
+用 Android Studio 打开本目录（Gradle 8.7 + Android SDK 34 + JDK 17），编译 `demo` 模块安装到手机。离线第一次构建需联网下载依赖。
+
+> APK 是云端真编译产出的（见 [.github/workflows/build-apk.yml](.github/workflows/build-apk.yml)）。核心算法另用 Python/OpenSSL 交叉验证（见文末"验证记录"）。本仓库不内置 Android SDK 与签名密钥。
+
+---
+
+## 截图展示
+
+> 📷 效果截图将由作者补充。以下为预留位置（把图片放进 `docs/screenshots/` 后，替换对应路径即可显示）。
+
+| 未激活 | 激活成功 |
+|---|---|
+| ![未激活界面](docs/screenshots/01-inactive.png) | ![激活成功](docs/screenshots/02-activated.png) |
+
+| 输入卡密 | 设备码 / Xposed 场景 |
+|---|---|
+| ![输入卡密](docs/screenshots/03-activate-dialog.png) | ![Xposed 场景](docs/screenshots/04-xposed.png) |
 
 ---
 
@@ -157,17 +187,71 @@ POST /verify
 
 ---
 
-## 验证记录
+## 常见问题（FAQ）
 
-本机环境：OpenSSL 3.5 / Python 3.13 / git；**无 JDK / Gradle / Android SDK**。
+<details>
+<summary><b>Q：演示卡密为什么在任何设备都能用？</b></summary>
+
+它签发时 `deviceId` 为空（不绑定设备），且到期时间设为 2035 年——故意做成"开箱即用"。真正的一机一码请用 `cardkey_tool.py issue --device <设备码>` 签发，或走在线模式由后端绑定。
+</details>
+
+<details>
+<summary><b>Q：提示"此卡密已在其他设备激活"是怎么回事？</b></summary>
+
+卡密签发时绑定了某台设备的 `deviceId`（ANDROID_ID 的 SHA256 前 16 位）。恢复出厂、换机、部分 ROM 重置 ANDROID_ID 都会变，导致不匹配。需要后端做解绑/换机流程。
+</details>
+
+<details>
+<summary><b>Q：改了系统时间是不是就能一直用？</b></summary>
+
+客户端会读系统时间判断到期，改时间能骗过**本地**校验。敏感业务必须把到期/封禁放在服务器裁定（在线模式 + 关键操作二次确认）。这是客户端方案的固有限制，不是 bug。
+</details>
+
+<details>
+<summary><b>Q：APK 安装时报"签名冲突 / 应用未安装"？</b></summary>
+
+CI 每次构建用新生成的临时签名。请先卸载旧版 Demo 再装新版。正式发布请用你自己的固定 keystore。
+</details>
+
+<details>
+<summary><b>Q：我要发自己的卡密，私钥放哪？</b></summary>
+
+放你自己的服务器或离线安全环境，**绝不进 app、不进 git**。`tools/cardkey_tool.py keygen` 生成后，`private.pem` 自己保管，公钥填进客户端。详见 [docs/keygen.md](docs/keygen.md)。
+</details>
+
+<details>
+<summary><b>Q：离线模式够安全吗？</b></summary>
+
+演示/小工具够用。但它挡不住"把合法卡密到处分享"。要商用请用在线模式 + 一机一码 + 激活次数限制 + 实时封禁，见 [安全模型](#安全模型) 和 [docs/backend.md](docs/backend.md)。
+</details>
+
+---
+
+## 验证记录
 
 | 项目 | 状态 |
 |---|---|
-| 密钥生成 → 签发 → 校验（Python+OpenSSL 端到端） | ✅ 通过 |
-| 载荷二进制格式 round-trip（含中文/UTF-8、时间戳、设备码） | ✅ 通过 |
+| 密钥生成 → 签发 → 校验（Python + OpenSSL 端到端） | ✅ 通过 |
+| 载荷二进制格式 round-trip（含 UTF-8、时间戳、设备码） | ✅ 通过 |
 | 签名有效性 / 设备匹配判别 | ✅ 通过 |
 | Base32 与 Java 实现一致性（同字母表、无填充） | ✅ 人工核对 |
-| Android 模块编译 | ⚠️ 未在本机编译（无 SDK），请在 Android Studio 验证 |
+| Demo APK 云端编译（GitHub Actions, Ubuntu + JDK 17 + SDK 34） | ✅ 见 [Releases](https://github.com/wanwu2026/CardKeySDK/releases) |
+| 真机运行 | ⚠️ 请在你的设备上实测 |
+
+说明：作者机器为 aarch64，Google 未提供该架构的 Android build-tools 原生包，故 APK 由 GitHub Actions 的 x86_64 runner 真编译产出，而非本机模拟。
+
+---
+
+## 免责声明
+
+本仓库为 **AI 辅助生成的开源学习/演示项目**，按 [MIT License](LICENSE) 提供，**不附带任何明示或暗示的担保**，包括但不限于适销性、特定用途适用性与不侵权。作者与生成方不对以下情形负责：
+
+- 将本 SDK 用于生产/商业系统后发生的卡密泄露、绕过、盗版或经济损失；
+- 使用者自行实现的后端存在的安全缺陷；
+- 私钥保管不当、设备绑定失效、系统时间被篡改带来的风险；
+- 在任何司法辖区的使用合规性（含许可、隐私、应用商店政策）。
+
+**在真实产品中启用前，请自行做安全审计、渗透测试与真机验证。** 安全边界在后端（私钥隔离 + 一机一码 + 实时封禁），客户端 SDK 只负责体验与挡住明显的篡改。
 
 ---
 

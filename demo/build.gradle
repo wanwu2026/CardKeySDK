@@ -14,10 +14,27 @@ android {
         versionName "1.0"
     }
 
+    // CI 构建用临时密钥签名（密钥由 workflow 生成，随 runner 销毁，不进仓库）。
+    // 本地构建时若无这些环境变量，则跳过签名配置，Android Studio 可直接跑 debug。
+    def ciStoreFile = System.getenv("CARDKEY_KEYSTORE")
+    signingConfigs {
+        ci {
+            if (ciStoreFile) {
+                storeFile file(ciStoreFile)
+                storePassword System.getenv("CARDKEY_STOREPASS")
+                keyAlias System.getenv("CARDKEY_KEYALIAS")
+                keyPassword System.getenv("CARDKEY_KEYPASS")
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (ciStoreFile) {
+                signingConfig signingConfigs.ci
+            }
         }
     }
 
