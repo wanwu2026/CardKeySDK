@@ -4,7 +4,7 @@
 
 > 🤖 本项目由 AI 生成。 / This project is AI-generated.
 
-> 🌿 **当前分支：`xposed-injection-module`（XP 注入式模块应用版）** —— 注入到目标 App 的 Xposed 模块，需 Xposed 框架。👉 另一个版本：[normal-android-app · 普通安卓应用版](https://github.com/wanwu2026/CardKeySDK/tree/normal-android-app)
+> 🌿 **当前分支：`xposed-injection-module`（XP 注入式模块应用版）** —— 注入到目标 App 的 Xposed 模块，需 Xposed 框架。👉 其他版本：[normal-android-app · 普通安卓应用](https://github.com/wanwu2026/CardKeySDK/tree/normal-android-app) ｜ [demo-backend · 演示后端](https://github.com/wanwu2026/CardKeySDK/tree/demo-backend)
 > 🌿 **Current branch: `xposed-injection-module` (Xposed injection module app)** — an Xposed module injected into target apps, requires the Xposed framework. 👉 Other version: [normal-android-app (standalone Android app)](https://github.com/wanwu2026/CardKeySDK/tree/normal-android-app)
 
 > 📖 语言 / Language: [中文](#中文) | [English](#english)
