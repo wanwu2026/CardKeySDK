@@ -76,15 +76,15 @@ CardKeySDK/
 
 ## 截图展示
 
-> 📷 效果截图将由作者补充。以下为预留位置（把图片放进 `docs/screenshots/` 后，替换对应路径即可显示）。
+以下为 Demo App 真机实拍：
 
 | 未激活 | 激活成功 |
 |---|---|
-| ![未激活界面](docs/screenshots/01-inactive.png) | ![激活成功](docs/screenshots/02-activated.png) |
+| ![未激活界面](docs/screenshots/01-inactive.jpg) | ![激活成功](docs/screenshots/02-activated.jpg) |
 
-| 输入卡密 | 设备码 / Xposed 场景 |
+| 输入卡密 | 激活详情 |
 |---|---|
-| ![输入卡密](docs/screenshots/03-activate-dialog.png) | ![Xposed 场景](docs/screenshots/04-xposed.png) |
+| ![输入卡密](docs/screenshots/03-activate-dialog.jpg) | ![激活详情](docs/screenshots/04-activated-detail.jpg) |
 
 ---
 
