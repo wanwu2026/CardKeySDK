@@ -35,17 +35,4 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 }
 
-// 发布为 AAR（JitPack / 本地 mavenLocal 均可用）
-apply plugin: 'maven-publish'
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.github.wanwu2026'
-                artifactId = 'CardKeySDK'
-                version = '1.0.0'
-            }
-        }
-    }
-}
+// AAR 由 :sdk:assembleRelease 产出；JitPack 直接从源码构建，无需本地 publish 配置。

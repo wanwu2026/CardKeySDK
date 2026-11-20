@@ -110,7 +110,7 @@ CardKeySDK/
 implementation project(':sdk')
 
 // B. 本地构建 AAR：./gradlew :sdk:assembleRelease → sdk/build/outputs/aar/
-//    C. JitPack（仓库已配 maven-publish，推 tag 后可用）
+//    C. JitPack（从源码构建，推 tag 后可用；无需本地 publish 配置）
 // 在 settings.gradle 的 repositories 加 maven { url 'https://jitpack.io' }
 implementation 'com.github.wanwu2026.CardKeySDK:sdk:v1.0.0'
 ```
@@ -384,7 +384,7 @@ Real photos taken on a device:
 implementation project(':sdk')
 
 // B. Build a local AAR: ./gradlew :sdk:assembleRelease → sdk/build/outputs/aar/
-//    C. JitPack (maven-publish is configured; available after a tag push)
+//    C. JitPack (builds from source after a tag push; no local publish config needed)
 // add to settings.gradle repositories: maven { url 'https://jitpack.io' }
 implementation 'com.github.wanwu2026.CardKeySDK:sdk:v1.0.0'
 ```
