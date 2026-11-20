@@ -1,0 +1,32 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'><style>
+@font-face { font-family: WQY; src: url('assets/font.ttc') format('truetype'); }
+* { box-sizing: border-box; }
+html,body { margin:0; width:1920px; height:1080px; overflow:hidden;
+  font-family: WQY, sans-serif; color:#e8eef7;
+  background: radial-gradient(circle at 30% 20%, #1b2a4a 0%, #0b1020 55%, #060911 100%); }
+.grid { position:absolute; inset:0; opacity:.12;
+  background-image: linear-gradient(#4a7bd0 1px,transparent 1px),linear-gradient(90deg,#4a7bd0 1px,transparent 1px);
+  background-size:60px 60px; }
+.glow { position:absolute; width:900px; height:900px; border-radius:50%; filter:blur(120px); opacity:.28; }
+.tag { position:absolute; top:70px; left:100px; font-size:30px; letter-spacing:8px; color:#7fa8ff; }
+.wrap { position:relative; padding:120px 120px; height:100%; display:flex; flex-direction:column; justify-content:center; }
+h1 { font-size:118px; margin:0 0 24px; letter-spacing:4px;
+  background:linear-gradient(90deg,#fff,#7fa8ff); -webkit-background-clip:text; color:transparent; }
+h2 { font-size:74px; margin:0 0 40px; color:#fff; }
+p { font-size:40px; color:#a9bdd8; margin:10px 0; line-height:1.5; }
+.accent { color:#5ee0a0; }
+.card { background:rgba(30,48,80,.55); border:1px solid rgba(127,168,255,.3); border-radius:24px;
+  padding:42px 46px; backdrop-filter:blur(8px); }
+.card h3 { font-size:46px; margin:0 0 16px; color:#fff; }
+.card p { font-size:32px; }
+.row { display:flex; gap:40px; }
+.col { flex:1; }
+.footer { position:absolute; bottom:60px; left:120px; font-size:28px; color:#5d7391; }
+</style></head><body><div class='grid'></div>
+<div class='wrap'><h2>答案：客户端 SDK + 你的后端</h2>
+<div class='row'>
+  <div class='card col'><h3>客户端 SDK（本项目）</h3>
+    <p>激活界面 + 验签逻辑<br>设备码 / 有效期 / 防篡改<br>零第三方依赖</p></div>
+  <div class='card col'><h3>后端（开发者自备）</h3>
+    <p>保管私钥 · 发卡验卡<br>一机一码 · 实时封禁<br>仓库提供接口约定与演示后端</p></div>
+</div></div><div class='footer'>CardKey · 安全边界在后端</div></body></html>

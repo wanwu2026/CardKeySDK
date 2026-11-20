@@ -32,3 +32,8 @@ Thumbs.db
 backend/keys/
 backend/*.db
 backend/*.db-journal
+
+# 宣传视频制作产物（成片大、渲染帧多、字体为第三方 GPL 授权，均不进仓库）
+promo/build/
+promo/frames/
+promo/assets/
