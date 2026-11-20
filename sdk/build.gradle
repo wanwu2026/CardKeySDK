@@ -24,8 +24,21 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            testLogging {
+                events "passed", "failed", "skipped"
+                showStandardStreams = false
+            }
+        }
+    }
 }
 
 dependencies {
     // org.json 由 Android 系统提供（android.jar），无需额外依赖
+    testImplementation 'junit:junit:4.13.2'
 }
+
+// AAR 由 :sdk:assembleRelease 产出；JitPack 直接从源码构建，无需本地 publish 配置。

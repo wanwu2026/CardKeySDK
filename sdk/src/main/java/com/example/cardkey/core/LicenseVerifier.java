@@ -1,6 +1,5 @@
 package com.example.cardkey.core;
 
-import android.util.Base64;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -28,8 +27,15 @@ public final class LicenseVerifier {
     public static LicensePayload verify(String license, PublicKey publicKey, String actualDeviceId)
             throws LicenseException {
         LicenseParts parts = split(license);
-        byte[] payloadBytes = Base32.decode(parts.payloadB32);
-        byte[] sig = Base32.decode(parts.sigB32);
+        // 畸形输入（非法字符/长度）必须转成可判别的 LicenseException，不能把运行时异常抛给调用方
+        byte[] payloadBytes;
+        byte[] sig;
+        try {
+            payloadBytes = Base32.decode(parts.payloadB32);
+            sig = Base32.decode(parts.sigB32);
+        } catch (RuntimeException e) {
+            throw new LicenseException(LicenseException.Code.MALFORMED, "卡密编码非法: " + e.getMessage(), e);
+        }
 
         // 先验签再解析，避免处理攻击者构造的数据
         if (!verifySignature(payloadBytes, sig, publicKey)) {
@@ -48,10 +54,30 @@ public final class LicenseVerifier {
         return p;
     }
 
+    /** 用多个公钥逐个验签，任一通过即返回；全部失败抛最后一个错误。用于密钥轮换过渡期。 */
+    public static LicensePayload verifyAny(String license, PublicKey[] keys, String actualDeviceId)
+            throws LicenseException {
+        if (keys == null || keys.length == 0) {
+            throw new LicenseException(LicenseException.Code.BAD_PUBLIC_KEY, "至少需要一个公钥");
+        }
+        LicenseException last = null;
+        for (PublicKey key : keys) {
+            try {
+                return verify(license, key, actualDeviceId);
+            } catch (LicenseException e) {
+                last = e;
+            }
+        }
+        if (last == null) {
+            last = new LicenseException(LicenseException.Code.INVALID_SIGNATURE, "签名验证失败");
+        }
+        throw last;
+    }
+
     /** 从 X.509 (SPKI) DER 的 Base64 文本加载公钥。 */
     public static PublicKey publicKeyFromBase64(String base64) throws LicenseException {
         try {
-            byte[] der = Base64.decode(base64, Base64.DEFAULT);
+            byte[] der = Base64.decode(base64);
             return KeyFactory.getInstance(KEY_ALGORITHM).generatePublic(new X509EncodedKeySpec(der));
         } catch (Exception e) {
             throw new LicenseException(LicenseException.Code.BAD_PUBLIC_KEY, "公钥格式错误: " + e.getMessage());

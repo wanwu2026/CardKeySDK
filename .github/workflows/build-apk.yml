@@ -16,6 +16,9 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
 
+      - name: 运行 Python 单元测试
+        run: python3 tools/test_cardkey_tool.py
+
       - name: 安装 JDK 17
         uses: actions/setup-java@v4
         with:
@@ -49,6 +52,9 @@ jobs:
           echo "CARDKEY_KEYPASS=cardkeydemo" >> "$GITHUB_ENV"
           echo "CARDKEY_KEYALIAS=demo" >> "$GITHUB_ENV"
           echo "临时密钥已生成（随 runner 销毁，不进仓库）"
+
+      - name: 运行 Java 单元测试
+        run: gradle :sdk:testDebugUnitTest --no-daemon --stacktrace
 
       - name: 编译 Release APK
         run: gradle :demo:assembleRelease --no-daemon --stacktrace
