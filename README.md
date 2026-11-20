@@ -4,8 +4,8 @@
 
 > 🤖 本项目由 AI 生成。 / This project is AI-generated.
 
-> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。👉 其他版本：[xposed-injection-module · XP 模块](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module) ｜ [demo-backend · 演示后端](https://github.com/wanwu2026/CardKeySDK/tree/demo-backend)
-> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. 👉 Other versions: [xposed-injection-module](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module) | [demo-backend](https://github.com/wanwu2026/CardKeySDK/tree/demo-backend)
+> 🌿 **当前分支：`normal-android-app`（普通安卓应用版）** —— 独立 App，含激活界面与示例 Demo。👉 另一个版本：[xposed-injection-module · XP 注入式模块应用版](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
+> 🌿 **Current branch: `normal-android-app` (normal Android app)** — a standalone app with activation UI and demo. 👉 Other version: [xposed-injection-module (Xposed injection module app)](https://github.com/wanwu2026/CardKeySDK/tree/xposed-injection-module)
 
 > 📖 语言 / Language: [中文](#中文) | [English](#english)
 
@@ -103,7 +103,21 @@ CardKeySDK/
 
 ## 接入你的 App（3 步）
 
-**1. 依赖**：把 `sdk` 模块作为 library 引入（`implementation project(':sdk')`），或把它打包成 AAR。
+**1. 依赖**（三选一）：
+
+```gradle
+// A. 源码引入（本仓库内）
+implementation project(':sdk')
+
+// B. 本地构建 AAR：./gradlew :sdk:assembleRelease → sdk/build/outputs/aar/
+//    C. JitPack（仓库已配 maven-publish，推 tag 后可用）
+// 在 settings.gradle 的 repositories 加 maven { url 'https://jitpack.io' }
+implementation 'com.github.wanwu2026.CardKeySDK:sdk:v1.0.0'
+```
+
+**在线模式**（服务器验卡 + 一机一码 + 实时封禁）见 [docs/online-mode.md](docs/online-mode.md)，含 demo-backend 联动与 Docker 启动。
+
+**密钥轮换**：`Config.publicKeyBase64s(oldKey, newKey)` 可同时信任多个公钥，换 key 时先加新钥、下线旧钥，不必强制用户升级。
 
 **2. 初始化**（建议在 `Application.onCreate`）：
 
@@ -247,9 +261,12 @@ CI 每次构建用新生成的临时签名。请先卸载旧版 Demo 再装新�
 | 密钥生成 → 签发 → 校验（Python + OpenSSL 端到端） | ✅ 通过 |
 | 载荷二进制格式 round-trip（含 UTF-8、时间戳、设备码） | ✅ 通过 |
 | 签名有效性 / 设备匹配判别 | ✅ 通过 |
-| Base32 与 Java 实现一致性（同字母表、无填充） | ✅ 人工核对 |
+| Base32 与 Java 实现一致性（同字母表、无填充） | ✅ Java 单元测试对照 RFC 4648 向量 |
+| Java 单元测试（Base64/Base32/签发→验签全链路/篡改/设备/过期/多公钥） | ✅ **17 项在本地 JVM 实跑全绿** |
+| sdk 全模块（除 UI 层）本地编译 | ✅ 用最小 Android stub 编译通过 |
+| 畸形卡密错误处理（非法编码） | ✅ 已修复：统一转 `LicenseException(MALFORMED)`，不再抛运行时异常 |
 | Demo APK 云端编译（GitHub Actions, Ubuntu + JDK 17 + SDK 34） | ✅ 见 [Releases](https://github.com/wanwu2026/CardKeySDK/releases) |
-| 真机运行 | ⚠️ 请在你的设备上实测 |
+| 真机运行（激活流程） | ✅ 已真机实测（截图见 [docs/screenshots](docs/screenshots/)） |
 
 
 ---
@@ -360,7 +377,21 @@ Real photos taken on a device:
 
 ## Integrate into Your App (3 Steps)
 
-**1. Dependency**: import the `sdk` module as a library (`implementation project(':sdk')`), or package it as an AAR.
+**1. Dependency** (pick one):
+
+```gradle
+// A. Source module (inside this repo)
+implementation project(':sdk')
+
+// B. Build a local AAR: ./gradlew :sdk:assembleRelease → sdk/build/outputs/aar/
+//    C. JitPack (maven-publish is configured; available after a tag push)
+// add to settings.gradle repositories: maven { url 'https://jitpack.io' }
+implementation 'com.github.wanwu2026.CardKeySDK:sdk:v1.0.0'
+```
+
+**Online mode** (server-side verification + one-device-one-code + instant revocation) is documented in [docs/online-mode.md](docs/online-mode.md), including the demo-backend and Docker setup.
+
+**Key rotation**: `Config.publicKeyBase64s(oldKey, newKey)` trusts multiple public keys, so you can add the new key and retire the old one without forcing users to upgrade.
 
 **2. Initialize** (recommended in `Application.onCreate`):
 
@@ -504,9 +535,12 @@ Fine for demos/small tools. It cannot stop "sharing a legitimate code everywhere
 | Keygen → issue → check (Python + OpenSSL end-to-end) | ✅ passed |
 | Payload binary round-trip (UTF-8, timestamps, device ID) | ✅ passed |
 | Signature validity / device match checks | ✅ passed |
-| Base32 consistency with Java (same alphabet, no padding) | ✅ manually checked |
+| Base32 consistency with Java (same alphabet, no padding) | ✅ Java unit tests against RFC 4648 vectors |
+| Java unit tests (Base64/Base32/issue→verify/tamper/device/expiry/multi-key) | ✅ **17 tests, run green on a local JVM** |
+| Full sdk module (except UI) local compile | ✅ compiled against minimal Android stubs |
+| Malformed license error handling | ✅ Fixed: normalized to `LicenseException(MALFORMED)` instead of a raw runtime exception |
 | Demo APK cloud build (GitHub Actions, Ubuntu + JDK 17 + SDK 34) | ✅ see [Releases](https://github.com/wanwu2026/CardKeySDK/releases) |
-| Running on a real device | ⚠️ please test on your device |
+| Running on a real device (activation flow) | ✅ tested on a real device (see [docs/screenshots](docs/screenshots/)) |
 
 
 ---

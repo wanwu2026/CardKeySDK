@@ -24,8 +24,28 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 }
 
 dependencies {
     // org.json 由 Android 系统提供（android.jar），无需额外依赖
+    testImplementation 'junit:junit:4.13.2'
+}
+
+// 发布为 AAR（JitPack / 本地 mavenLocal 均可用）
+apply plugin: 'maven-publish'
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.github.wanwu2026'
+                artifactId = 'CardKeySDK'
+                version = '1.0.0'
+            }
+        }
+    }
 }

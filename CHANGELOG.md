@@ -11,9 +11,22 @@
 - README 中英双语、分支互跳链接
 - `tools/test_cardkey_tool.py`：Base32 / 载荷 / 签名单元测试（8 项）
 
+### Fixed
+- 畸形卡密（非法 Base32 编码）不再抛 `IllegalArgumentException`，统一转 `LicenseException(MALFORMED)`
+
 ### Changed
 - 代码注释精简为常规工程风格
 - CI 按分支独立构建、独立 Release tag
+- Java 核心层改用纯 JVM Base64（原 android.util.Base64 移出验签链路）
+- CI：新增 Java 单元测试步骤；`v*` tag 推送时发布语义化版本 Release
+
+### Added
+- `sdk/src/test/`：Java 单元测试 17 项（Base64/Base32 RFC 向量、签发→验签全链路、篡改/设备/过期/错钥拒绝、多公钥轮换）
+- `Config.publicKeyBase64s(String...)` + `LicenseVerifier.verifyAny`：多公钥并存，支持平滑换钥
+- `CardKey.refreshWithBackend(...)`：在线模式向服务器复核激活状态，被拒即清空本地（感知封禁/撤销）
+- `docs/online-mode.md`：在线模式完整接入指南
+- `docs/online-mode.md`：在线模式完整接入指南（demo-backend 联动）
+- `sdk` 模块 `maven-publish`：可发布 AAR / 供 JitPack 构建
 
 ## [1.0.0] - 2026-11-19
 

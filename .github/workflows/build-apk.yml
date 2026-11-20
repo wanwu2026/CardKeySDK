@@ -57,6 +57,9 @@ jobs:
           echo "CARDKEY_KEYALIAS=demo" >> "$GITHUB_ENV"
           echo "临时密钥已生成（随 runner 销毁，不进仓库）"
 
+      - name: 运行 Java 单元测试
+        run: gradle :sdk:testDebugUnitTest --no-daemon --stacktrace
+
       - name: 编译 Release APK
         run: gradle :demo:assembleRelease --no-daemon --stacktrace
 
@@ -77,11 +80,24 @@ jobs:
           path: CardKeyDemo-release.apk
           if-no-files-found: error
 
+      - name: 解析版本号（tag 推送用语义化版本，否则用 demo-latest）
+        id: version
+        run: |
+          REF=${GITHUB_REF#refs/tags/}
+          if [ "$REF" != "${GITHUB_REF#refs/tags/}" ]; then
+            # 是 tag 推送：只接受 vX.Y.Z 语义化版本
+            echo "TAG=$REF" >> "$GITHUB_ENV"
+            echo "RELEASE_NAME=$REF" >> "$GITHUB_ENV"
+          else
+            echo "TAG=demo-latest" >> "$GITHUB_ENV"
+            echo "RELEASE_NAME=CardKey Demo APK（最新构建）" >> "$GITHUB_ENV"
+          fi
+
       - name: 发布到 Releases
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: demo-latest
-          name: CardKey Demo APK（最新构建）
+          tag_name: ${{ env.TAG }}
+          name: ${{ env.RELEASE_NAME }}
           body: |
             由 GitHub Actions 自动编译的示例 App，已用临时密钥签名，可直接安装。
             演示卡密见 `demo/demo_license.txt`（免设备绑定，2035 年到期）。
@@ -89,4 +105,5 @@ jobs:
             > 这是**演示包**，签名密钥每次构建都重新生成且随 runner 销毁。
             > 自己发布正式 App 请用你自己的密钥，见 `docs/keygen.md`。
           files: CardKeyDemo-release.apk
+          generate_release_notes: ${{ github.ref_type == 'tag' }}
           preserve_existing_tag: true
