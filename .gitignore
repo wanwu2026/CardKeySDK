@@ -34,6 +34,8 @@ backend/*.db
 backend/*.db-journal
 
 # 宣传视频制作产物（成片大、渲染帧多、字体为第三方 GPL 授权，均不进仓库）
+# 成片与封面随 GitHub Release 分发：releases/tag/promo-v1
 promo/build/
 promo/frames/
 promo/assets/
+promo/cover-bilibili.jpg

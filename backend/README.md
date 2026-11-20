@@ -9,6 +9,19 @@
 - 系统 `openssl` 命令（签发/验签复用 `tools/cardkey_tool.py`）
 - 零第三方 pip 包
 
+## Docker 一键启动
+
+```bash
+docker build -t cardkey-backend -f backend/Dockerfile .
+docker run -d -p 8080:8080 \
+    -v $(pwd)/backend/keys:/app/backend/keys \
+    -e ADMIN_TOKEN=change-me \
+    -e PRIVATE_KEY=/app/backend/keys/private.pem \
+    cardkey-backend
+```
+
+私钥通过卷挂载进容器，**不写进镜像层**；容器内置 `/health` 健康检查。
+
 ## 快速开始
 
 ```bash
