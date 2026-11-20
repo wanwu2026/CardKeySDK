@@ -27,6 +27,12 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.all {
+            testLogging {
+                events "passed", "failed", "skipped"
+                showStandardStreams = false
+            }
+        }
     }
 }
 
